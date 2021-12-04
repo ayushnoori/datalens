@@ -5,6 +5,8 @@ Authors@R: person('Ayush', 'Noori', email = 'anoori1@mgh.harvard.edu', role = c(
 Description: Alzheimer DataLENS is an open data analysis platform which aims to advance Alzheimer’s disease research by enabling the analysis, visualization, and sharing of -omics data.
 License: GPL (>= 3)
 Imports: 
+    argonDash (>= 0.3.0.9000),
+    argonR,
     attempt,
     config (>= 0.3.1),
     data.table,
@@ -13,6 +15,7 @@ Imports:
     golem (>= 0.3.1),
     htmltools,
     magrittr,
+    mongolite,
     processx,
     purrr,
     shiny (>= 1.7.1)
@@ -26,3 +29,5 @@ Suggests:
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Language: en-US
+Remotes: 
+    RinteRface/argonDash

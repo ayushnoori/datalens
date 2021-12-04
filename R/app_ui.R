@@ -2,19 +2,32 @@
 #' 
 #' @param request Internal parameter for `{shiny}`. 
 #'     DO NOT REMOVE.
-#' @import shiny
+#' @import shiny argonDash
 #' @noRd
 app_ui <- function(request) {
   tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
     
-    # application UI logic
-    htmlTemplate(
-      app_sys("app/www/index.html"),
-      body = tagList()
-      # add here other template arguments
+    # shiny fluid page
+    fluidPage(
+      title = "Alzheimer DataLENS",
+      sidebarLayout(
+        
+        # sidebar with input
+        sidebarLayout(
+          
+        ),
+        
+        mainPanel(
+          
+          
+          
+        )
+        
+      )
     )
+    
   )
 }
 

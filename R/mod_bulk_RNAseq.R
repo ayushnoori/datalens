@@ -1,23 +1,23 @@
-#' example UI Function
+#' bulk_RNAseq UI Function
 #'
-#' @description A shiny Module.
+#' @description A shiny module to view bulk RNA-seq data analysis.
 #'
 #' @param id,input,output,session Internal parameters for {shiny}.
 #'
 #' @noRd 
 #'
 #' @importFrom shiny NS tagList 
-mod_example_ui <- function(id){
+mod_bulk_RNAseq_ui <- function(id){
   ns <- NS(id)
   tagList(
  
   )
 }
     
-#' example Server Functions
+#' bulk_RNAseq Server Functions
 #'
 #' @noRd 
-mod_example_server <- function(id){
+mod_bulk_RNAseq_server <- function(id){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
  
@@ -25,7 +25,7 @@ mod_example_server <- function(id){
 }
     
 ## To be copied in the UI
-# mod_example_ui("example_ui_1")
+# mod_bulk_RNAseq_ui("bulk_RNAseq_ui_1")
     
 ## To be copied in the server
-# mod_example_server("example_ui_1")
+# mod_bulk_RNAseq_server("bulk_RNAseq_ui_1")
