@@ -47,6 +47,10 @@ You can install the the development version of DataLENS from [GitHub](https://gi
 devtools::install_github("ayushnoori/datalens")
 ```
 
+## Authors
+Alzheimer DataLENS was created by [Ayush Noori](mailto:anoori1@mgh.harvard.edu) for CS50 at Harvard College.
+
+
 <!-- ## Example -->
 
 <!-- This is a basic example which shows you how to solve a common problem: -->
