@@ -21,12 +21,33 @@ app_ui <- function(request) {
         
         mainPanel(
           
-          
-          
         )
         
       )
     )
+    
+    # # application UI logic
+    # argonDashPage(
+    #   title = "Alzheimer DataLENS",
+    #   author = "Ayush Noori",
+    #   description = "-Omics Data Analysis Platform for Alzheimer’s Disease Research",
+    #   sidebar = argonSidebar,
+    #   navbar = argonNav, 
+    #   header = argonHeader,
+    #   body = argonDashBody(
+    #     argonTabItems(
+    #       # cards_tab,
+    #       # tables_tab,
+    #       # tabsets_tab,
+    #       # alerts_tab,
+    #       # images_tab,
+    #       # items_tab,
+    #       # effects_tab,
+    #       # sections_tab
+    #     )
+    #   )
+    # )
+    
     
   )
 }

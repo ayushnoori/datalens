@@ -20,6 +20,9 @@ mod_bulk_RNAseq_ui <- function(id){
 mod_bulk_RNAseq_server <- function(id){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
+    
+    # connect to MongoDB collection
+    
  
   })
 }
