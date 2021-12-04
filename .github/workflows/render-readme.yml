@@ -5,8 +5,7 @@ name: Render README
 on:
   push:
     paths:
-      - 'examples/README.Rmd'
-      - 'examples/*yaml'
+      - 'README.Rmd'
 
 jobs:
   render:
@@ -23,7 +22,7 @@ jobs:
           remotes::install_cran("rmarkdown")
         shell: Rscript {0}
       - name: Render README
-        run: Rscript -e 'rmarkdown::render("examples/README.Rmd")'
+        run: Rscript -e 'rmarkdown::render("README.Rmd")'
       - name: Commit results
         run: |
           git config --local user.email "actions@github.com"
