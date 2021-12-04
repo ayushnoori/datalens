@@ -47,8 +47,8 @@ You can install the the development version of DataLENS from [GitHub](https://gi
 devtools::install_github("ayushnoori/datalens")
 ```
 
-## Authors
-Alzheimer DataLENS was created by [Ayush Noori](mailto:anoori1@mgh.harvard.edu) for CS50 at Harvard College.
+## Authorship
+Alzheimer DataLENS was created by [Ayush Noori](mailto:anoori1@mgh.harvard.edu) for CS50 at Harvard College. DataLENS is an initiative of the [MIND Data Science Lab](https://www.massgeneral.org/neurology/research/mind-data-science-lab) in the MassGeneral Institute for Neurodegenerative Disease (MIND) at Massachusetts General Hospital.
 
 
 <!-- ## Example -->
