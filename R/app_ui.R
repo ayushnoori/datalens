@@ -8,9 +8,12 @@ app_ui <- function(request) {
   tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
-    # Your application UI logic 
-    fluidPage(
-      h1("datalens")
+    
+    # application UI logic
+    htmlTemplate(
+      app_sys("app/www/index.html"),
+      body = tagList()
+      # add here other template arguments
     )
   )
 }
@@ -33,7 +36,7 @@ golem_add_external_resources <- function(){
     favicon(),
     bundle_resources(
       path = app_sys('app/www'),
-      app_title = 'datalens'
+      app_title = 'DataLENS'
     )
     # Add here other external resources
     # for example, you can add shinyalert::useShinyalert() 
