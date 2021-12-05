@@ -7,52 +7,16 @@
 
 # load libraries
 library(shiny)
-library(shinydashboard)
 library(mongolite) # read from MongoDB database
 
 
 # USER INTERFACE
 
 # define user interface
-ui = dashboardPage(
-    skin = "purple",
-    
-    # define header
-    dashboardHeader(title = "Alzheimer DataLENS"),
-    
-    # define sidebar
-    dashboardSidebar(
-        sidebarMenu(
-            menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard")),
-            menuItem("Widgets", tabName = "widgets", icon = icon("th"))
-        )
-    ),
-    
-    # define body
-    dashboardBody(
-        # link to CSS stylesheet
-        tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "custom.css")),
-        tabItems(
-            
-            # DASHBOARD
-            tabItem(tabName = "dashboard",
-                    fluidRow(
-                        box(
-                            title = "Controls",
-                            sliderInput("bins", "Number of bins:", min = 1, max = 50, value = 30)
-                        ),
-                        box(plotOutput("distPlot"))
-                    )
-            ),
-            
-            # WIDGETS
-            tabItem(tabName = "widgets",
-                    h2("Widgets tab content")
-            )
-        )
-    )
+ui <- htmlTemplate("index.html",
+                   button = actionButton("action", "Action"),
+                   slider = sliderInput("x", "X", 1, 100, 50)
 )
-
 
 # SERVER LOGIC
 
@@ -80,4 +44,4 @@ server <- function(input, output) {
 # RUN APPLICATION
 
 # run the application 
-shinyApp(ui = ui, server = server)
+shinyAppDir(ui = ui, server = server)
