@@ -16,6 +16,10 @@ library(data.table) # data tables in R
 library(purrr) # iterable functions
 library(magrittr) # pipes
 library(org.Hs.eg.db) # map human genes
+library(httr) # POST request
+library(igraph) # graph
+library(ggraph)
+
 
 # plotting theme
 base_theme = theme_bw() + theme(
@@ -149,9 +153,12 @@ ui <- dashboardPage(
                     fluidRow(
                         box(title = "Select Genes", status = "primary", solidHeader = TRUE, width = 4,
                             p("Modify the gene list in Input Genes."),
-                            uiOutput("select_network_genes")
+                            uiOutput("select_network_genes"),
+                            # generate network button
+                            actionButton("generate_network", "Generate Network")
                             ),
-                        box(title = "Network Plot", status = "warning", solidHeader = TRUE, width = 8
+                        box(title = "Network Plot", status = "warning", solidHeader = TRUE, width = 8,
+                            girafeOutput("network_plot")
                         )
                     )
             )
@@ -258,12 +265,64 @@ server <- function(input, output, session) {
     })
     
     
+    # SUBJECT EXPRESSION ANALYSIS
+    
+    # query subjects by filters, etc.
+    # query subject expression by subjects returned
+    # forest plot
+    
+    
     # NETWORK
+    
+    # make selector
     output$select_network_genes = renderUI({
         selectizeInput("network_genes", "Select Genes",
                        choices = valid_genes()[, Symbol], multiple = T)
     })
     
+    # STRING API call to get network
+    net = eventReactive(input$generate_network, {
+        
+        # check if genes are sufficient
+        validate(need(length(input$network_genes) > 0, "Please select at least one valid gene."))
+        
+        # construct POST request
+        root_api = "https://version-11-0b.string-db.org/api"
+        get_network = list(identifiers = paste(input$network_genes, collapse = "%0d"),
+                           species = "9606", echo_query = "1", caller_identity = "DataLENS")
+        
+        # complete API call to retrieve network
+        network_request = httr::POST(url = paste0(root_api, "/tsv/network"), body = get_network)
+        network = httr::content(network_request, as = "text", encoding = "UTF-8") %>%
+            fread() %>%
+            .[, c("stringId_A", "stringId_B", "ncbiTaxonId") := NULL] %>%
+            unique()
+        
+    })
+    
+    # show output
+    output$network_plot = renderGirafe({
+        
+        # construct network graph
+        network_graph = graph_from_data_frame(d = net(), directed = FALSE)
+        
+        # toggle to change node size
+        minmax = c(1, 10)
+        
+        # make static network plot with interactive parameter
+        static_graph = ggraph(network_graph, layout = "stress") + 
+            geom_edge_link(aes(width = score), alpha = 0.4) +
+            scale_edge_width(range = c(0.2, 0.9)) +
+            geom_point_interactive(mapping = aes(x = x, y = y, tooltip = name),
+                                   size = 5) +
+            # scale_size(range = minmax) +
+            theme_graph(fg_text_colour = "black", base_family = "sans") + 
+            labs(edge_width = "Score")
+        
+        # convert to interactive network plot
+        girafe(ggobj = static_graph)
+        
+    })
     
 }
 
