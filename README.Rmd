@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: end -->
 
-Alzheimer DataLENS is an open data analysis platform which aims to advance Alzheimer's disease research by enabling the analysis, visualization, and sharing of -omics data. DataLENS will houses bioinformatics pipelines for the analysis of -omics data on Alzheimer's disease and related dementias as well as streamlined web interfaces which allow neuroscientists to browse and query the results of these analyses. Currently, we have identified are over 50 possible genetic, proteomics, and transcriptomics studies which are suitable for DataLENS. Some example datasets which could be made available on DataLENS now or in the future include:
+Alzheimer DataLENS is an open data analysis platform which aims to advance Alzheimer's disease research by enabling the analysis, visualization, and sharing of -omics data. DataLENS houses bioinformatics pipelines for the analysis of -omics data on Alzheimer's disease and related dementias as well as streamlined web interfaces which allow neuroscientists to browse and query the results of these analyses. Currently, we have identified are over 50 possible genetic, proteomics, and transcriptomics studies which are suitable for DataLENS. Some example datasets which could be made available on DataLENS now or in the future include:
 
 **Gene Expression Data**
 
@@ -52,6 +52,6 @@ You can install the the development version of DataLENS from [GitHub](https://gi
 devtools::install_github("ayushnoori/datalens")
 ```
 
-## Authorship
+## Attribution
 
 Alzheimer DataLENS was created by [Ayush Noori](mailto:anoori1@mgh.harvard.edu) for CS50 at Harvard College. DataLENS is an initiative of the [MIND Data Science Lab](https://www.massgeneral.org/neurology/research/mind-data-science-lab) in the MassGeneral Institute for Neurodegenerative Disease (MIND) at Massachusetts General Hospital.
