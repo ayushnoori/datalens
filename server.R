@@ -19,6 +19,7 @@ library(httr) # POST request
 library(data.table) # data tables in R
 library(purrr) # iterable functions
 library(magrittr) # pipes
+library(reader) # auto delimiting
 
 # load data visualization libraries
 library(ggplot2) # data visualization
@@ -42,6 +43,7 @@ base_theme = theme_bw() + theme(
 # connect to MongoDB database
 # hostname localhost and port 27017 are default for local MongoDB connections
 mongo_url = "mongodb://127.0.0.1:27017"
+main = mongo(collection = "main", db = "datalens", url = mongo_url)
 expression = mongo(collection = "expression", db = "datalens", url = mongo_url)
 subject_expression = mongo(collection = "subject_expression", db = "datalens", url = mongo_url)
 subject_covariates = mongo(collection = "subject_covariates", db = "datalens", url = mongo_url)
@@ -56,16 +58,25 @@ server <- function(input, output, session) {
   
   # delay reaction until user presses validate button
   raw_genes = eventReactive(input$validate_genes, {
-    genes_split = strsplit(input$input_genes, input$input_sep)[[1]]
-    validate(need(length(genes_split) <= 10, "Please input fewer than 100 genes."),
-             need(length(genes_split) > 0, "Please input at least one valid gene."))
+    
+    # could adapt for auto-delimiting in the future
+    delim = input$input_sep
+    
+    # split genes
+    genes_split = unique(strsplit(input$input_genes, delim)[[1]])
     genes_split
+    
   })
   
   # validate input genes by mapping to human database
   select_keys = c("SYMBOL", "ENTREZID", "GENENAME", "ENSEMBL", "GENETYPE") # , "GO", "UNIPROT"
   select_key_names = c("Symbol", "ENTREZ", "Gene", "Ensembl", "Type") # "GO", "UniProt"
   select_result = eventReactive(input$validate_genes, {
+    
+    # first, validate input
+    validate(need(length(raw_genes()) <= 100, "Please input fewer than 100 genes."),
+             need(length(raw_genes()) > 0, "Please input at least one valid gene."))
+    
     # try/catch in case no mappings are found
     try_select = tryCatch(expr = {
       AnnotationDbi::select(org.Hs.eg.db, keys = raw_genes(), 
@@ -77,6 +88,7 @@ server <- function(input, output, session) {
       error = function(e) {
         data.table()  
       })
+    
     # validate try/catch
     validate(need(nrow(try_select) > 0, "No matches found."))
     try_select
@@ -157,7 +169,7 @@ server <- function(input, output, session) {
   })
   
   
-  # SUBJECT EXPRESSION ANALYSIS
+  # REGIONAL EXPRESSION ANALYSIS
   
   # query subjects by filters, etc.
   # query subject expression by subjects returned
@@ -166,10 +178,46 @@ server <- function(input, output, session) {
   
   # NETWORK
   
-  # make selector
+  # make gene selector
   output$select_network_genes = renderUI({
     selectizeInput("network_genes", "Select Genes",
                    choices = valid_genes()[, Symbol], multiple = T)
+  })
+  
+  # get all datasets
+  net_datasets = main$find() %>% as.data.table()
+  
+  # make dataset selector
+  output$select_network_study = renderUI({
+    selectizeInput("network_study", "Select Study",
+                   choices = net_datasets[, unique(StudyName)], multiple = F,
+                   selected = "ROSMAP")
+  })
+  
+  # make brain region selector
+  output$select_network_region = renderUI({
+    selectizeInput("network_region", "Select Brain Region",
+                   choices = net_datasets[StudyName %in% input$network_study, unique(BrainRegionFull)], multiple = T,
+                   selected = "Dorsolateral Prefrontal Cortex")
+  })
+  
+  # make comparison selector
+  output$select_network_contrast = renderUI({
+    selectizeInput("network_contrast", "Select Contrast",
+                   choices = net_datasets[StudyName %in% input$network_study & BrainRegionFull %in% input$network_region, unique(Contrast)], multiple = T,
+                   selected = "B3-B1")
+  })
+  
+  # make dataset selector
+  output$select_network_analysis = renderUI({
+    
+    possible_analyses = net_datasets[StudyName %in% input$network_study & BrainRegionFull %in% input$network_region & Contrast %in% input$network_contrast, FileName]
+    names(possible_analyses) = gsub("(_)|(.csv)", " ", possible_analyses)
+    
+    selectizeInput("network_analysis", "Select Analysis",
+                   choices = possible_analyses, multiple = F,
+                   selected = "ROSMAP_PFC_Braak_B3-B1.csv")
+    
   })
   
   # STRING API call to get network
@@ -179,6 +227,7 @@ server <- function(input, output, session) {
     validate(need(length(input$network_genes) > 0, "Please select at least one valid gene."))
     
     # construct POST request
+    # example of input$network_genes: c("GFAP", "APP", "TMEM119", "CHI3L1", "PSEN1")
     root_api = "https://version-11-0b.string-db.org/api"
     get_network = list(identifiers = paste(input$network_genes, collapse = "%0d"),
                        species = "9606", echo_query = "1", caller_identity = "DataLENS")
@@ -192,27 +241,73 @@ server <- function(input, output, session) {
     
   })
   
+  # make updated query, using eventReactive() to minimize database calls
+  network_query = eventReactive(input$update_network, {
+    # note that the below line can be used in the MongoDB shell to construct an index on both GeneSymbol and FileName
+    # db.expression.createIndex({ "GeneSymbol": 1, "FileName": 1 })
+    # to just construct on FileName
+    # db.expression.createIndex({ "FileName": 1 })
+    
+    # query database for fold-change and significance values in user-selected analysis
+    # construct MongoDB query below, example of input$network_analysis: "ROSMAP_PFC_Braak_B3-B1.csv"
+    expression$find(paste0('{"FileName" : "', input$network_analysis, '"}'))
+  })
+  
   # show output
-  output$network_plot = renderGirafe({
+  net_graph = reactive({
     
     # construct network graph
     network_graph = graph_from_data_frame(d = net(), directed = FALSE)
     
+    # get vertices
+    network_vertices = vertex_attr(network_graph, "name") %>% factor(., levels = .)
+    
+    # parse network based on nodes
+    validate(need(!is.null(network_query()), "Please select a dataset of interest and update the graph."))
+    network_vals = network_query() %>% # database query
+      as.data.table() %>%
+      .[GeneSymbol %in% network_vertices] %>%
+      .[order(AveExpr)] %>%
+      .[!duplicated(GeneSymbol)] %>%
+      # clean and remove unneeded columns
+      .[, .SD, .SDcols = c("GeneSymbol", expr_cols)] %>%
+      .[, FileName := gsub("(_)|(.csv)", " ", FileName)] %>%
+      .[, (numeric_cols) := map(.SD, ~round(as.numeric(.x), 7)), .SDcols = numeric_cols] %>%
+      setnames(c("GeneSymbol", expr_cols), c("name", expr_col_names)) %>%
+      # set correct order to match with graph and fill in any missing vertices
+      merge(data.table(name = network_vertices), ., all = T, sort = F) %>%
+      .[is.na(logFC), c("logFC", "P") := .(0, 1)]
+    
+    # assign vertex attributes
+    vertex_attr(network_graph) <- network_vals
+    
+    network_graph
+  })
+    
+  # show output
+  output$network_plot = renderGirafe({
+    
     # toggle to change node size
-    minmax = c(1, 10)
+    minmax = c(2, 10)
     
     # make static network plot with interactive parameter
-    static_graph = ggraph(network_graph, layout = "stress") + 
+    static_graph = ggraph(net_graph(), layout = "stress") + 
       geom_edge_link(aes(width = score), alpha = 0.4) +
       scale_edge_width(range = c(0.2, 0.9)) +
-      geom_point_interactive(mapping = aes(x = x, y = y, tooltip = name),
-                             size = 5) +
-      # scale_size(range = minmax) +
+      geom_point_interactive(mapping = aes(x = x, y = y,
+                                           tooltip = paste0(name, "\nlogFC: ", logFC, "\np-value: ", P),
+                                           fill = logFC, size = -log10(P)),
+                             shape = 21, color = "black") +
+      scale_fill_gradient2_interactive(low = "#20A4F3", mid = "white", high = "#FF6B6B", midpoint = 0) +
+      scale_size(range = minmax) +
       theme_graph(fg_text_colour = "black", base_family = "sans") + 
-      labs(edge_width = "Score")
+      labs(edge_width = "Score", fill = "logFC", size = "-log10(P)")
     
     # convert to interactive network plot
-    girafe(ggobj = static_graph)
+    girafe(ggobj = static_graph, options = list(
+      opts_hover(css = "fill:#6006EA;stroke:black;cursor:pointer;", reactive = TRUE),
+      opts_selection(type = "multiple", css = "fill:#6006EA;stroke:black;")
+      ))
     
   })
   
