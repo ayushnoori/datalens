@@ -1,5 +1,5 @@
 
-<img src="www/assets/logo.svg" title="Alzheimer DataLENS" style="margin-top: 1em; margin-bottom: 1em;" width="504"/>
+<img src="www/assets/logo.svg" title="Alzheimer DataLENS" style="padding-top: 2em; padding-bottom: 2em; margin: 0 auto; display: block; width: 60%;" width="504"/>
 
 # Design Summary
 
