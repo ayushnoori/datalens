@@ -1,5 +1,9 @@
 
+<p align="center">
+
 <img src="www/assets/logo.svg" title="Alzheimer DataLENS" style="padding-top: 2em; padding-bottom: 2em; margin: 0 auto; display: block; width: 60%;" width="504"/>
+
+</p>
 
 # About DataLENS
 
