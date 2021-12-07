@@ -19,12 +19,12 @@ library(httr) # POST request
 library(data.table) # data tables in R
 library(purrr) # iterable functions
 library(magrittr) # pipes
-library(reader) # auto delimiting
 
 # load data visualization libraries
 library(ggplot2) # data visualization
 library(plotly) # interactive data visualization
 library(DT) # JS data tables
+library(ggseg) # brain visualization
 library(igraph) # graph representation
 library(ggraph) # graph plotting
 library(ggiraph) # interactive graph plotting
@@ -53,6 +53,13 @@ subject_covariates = mongo(collection = "subject_covariates", db = "datalens", u
 
 # define server-side logic
 server <- function(input, output, session) {
+  
+  # BASELINE QUERIES
+  
+  # first, queries which are non-reactive (i.e., always must be made) are performed
+  message("Querying MongoDB database, main collection")
+  all_datasets = main$find() %>% as.data.table() # get all datasets
+  
   
   # INPUT GENES
   
@@ -129,6 +136,7 @@ server <- function(input, output, session) {
   # query expression collection using gene input
   # run expression$index() to view indexes
   expr_dat = reactive({
+    message("Querying MongoDB database, expression collection")
     expr_mat = expression$find(paste0('{"GeneSymbol" : "', input$expr_gene, '"}')) # database query
     validate(need(nrow(expr_mat) > 0, "No results available for this gene."))
     expr_mat %>%
@@ -170,6 +178,112 @@ server <- function(input, output, session) {
   
   
   # REGIONAL EXPRESSION ANALYSIS
+  # inspired by https://github.com/anniegbryant/DA5030_Final_Project
+  
+  # # construct brain region mapping
+  # brain_regions = unique(all_datasets$BrainRegionFull) %>%
+  #   data.table(Region = .) %>%
+  #   .[order(Region)]
+  
+  # read manual mapping file constructed from the brain regions in the Desikan-Killany (dk) cortical atlas
+  # and automatic subcortical segmentation atlas (aseg), remove bulk cortex
+  brain_mapping = fread("www/assets/ggseg_mapping.csv")[!Region == "Cortex"]
+  
+  # render selector for gene of interest
+  output$select_region_gene = renderUI(
+    selectInput("region_gene", "Select Gene of Interest", choices = valid_genes()[, Symbol]))
+  
+  # render selector for brain region
+  # output$select_region = renderUI(
+  #   checkboxGroupInput("regions", "Select Brain Region", choices = brain_mapping$Region, inline = F))
+  
+  # render dropdown selector
+  output$select_region = renderUI(
+    selectizeInput("regions", "Select Brain Region", choices = brain_mapping$Region, multiple = T))
+  
+  # define theme for brain plots
+  atlas_theme = theme(axis.text = element_blank(),
+                      axis.title = element_blank(),
+                      legend.position = "none")
+  
+  # plot DK atlas brain regions
+  output$dk_plot = renderPlot({
+    
+    # get selected regions which correspond to the Desikan-Killany (dk) cortical atlas
+    # example of input$regions: c("Amygdala", "Inferior Frontal Gyrus", "Frontal Pole", "Putamen", "Superior Temporal Gyrus")
+    dk_regions = brain_mapping[Region %in% input$regions & Atlas == "dk", ]
+    
+    # save computation time if no regions are selected
+    if(nrow(dk_regions) == 0) {
+      
+      dk_out = ggseg(atlas = "dk", fill = "#DAE0E7",
+                     color = "white", position = "stacked") +
+        atlas_theme
+      
+    # otherwise, search for and highlight selected regions
+    } else {
+      
+      dk_data = as.data.table(dk$data) %>%
+        .[, Selected := factor(ifelse(region %in% dk_regions$Mapping, "Yes", "No"), levels = c("Yes", "No"))] %>%
+        .[, .(region, Selected)] %>%
+        unique()
+      
+      dk_out = ggseg(dk_data, atlas = "dk", mapping = aes(fill = Selected),
+            color = "white", position = "stacked") +
+        scale_fill_manual(values = c("#FF6B6B", "#DAE0E7"), na.value = "#DAE0E7") + 
+        atlas_theme
+      
+    }
+    
+    dk_out
+    
+  })
+  
+  # plot ASEG atlas brain regions
+  output$aseg_plot = renderPlot({
+    
+    # get selected regions which correspond to the automatic subcortical segmentation atlas (aseg) cortical atlas
+    aseg_regions = brain_mapping[Region %in% input$regions & Atlas == "aseg", ]
+    
+    # save computation time if no regions are selected
+    if(nrow(aseg_regions) == 0) {
+      
+      aseg_out = ggseg(atlas = "aseg", fill = "#DAE0E7",
+                     color = "white") +
+        atlas_theme
+      
+      # otherwise, search for and highlight selected regions
+    } else {
+      
+      aseg_data = as.data.table(aseg$data) %>%
+        .[, Selected := factor(ifelse(region %in% aseg_regions$Mapping, "Yes", "No"), levels = c("Yes", "No"))] %>%
+        .[, .(region, Selected)] %>%
+        unique()
+      
+      aseg_out = ggseg(aseg_data, atlas = "aseg", mapping = aes(fill = Selected), color = "white") +
+        scale_fill_manual(values = c("#FF6B6B", "#DAE0E7"), na.value = "#DAE0E7") + 
+        atlas_theme
+      
+    }
+    
+    aseg_out
+    
+  })
+  
+  # rename columns
+  dataset_cols = c("BrainRegionFull", "StudyName", "DatasetCode", "StratFactor", "LabelGroupA", "LabelGroupB", "NGenes", "StudySynID")
+  dataset_col_names = c("Region", "Study", "Code", "Factor", "Group 1", "Group 2", "No. Genes", "Reference")
+  
+  # create table for second tab
+  output$region_table = renderDT({
+    all_datasets %>%
+      .[BrainRegionFull %in% input$regions] %>%
+      .[, LabelGroupA := paste0(LabelGroupA, " (n=", NSubjectsGroupA, ")")] %>%
+      .[, LabelGroupB := paste0(LabelGroupB, " (n=", NSubjectsGroupB, ")")] %>%
+      .[, .SD, .SDcols = dataset_cols] %>%
+      setnames(dataset_cols, dataset_col_names)
+  })
+  
   
   # query subjects by filters, etc.
   # query subject expression by subjects returned
@@ -178,40 +292,40 @@ server <- function(input, output, session) {
   
   # NETWORK
   
-  # make gene selector
+  # hierarchy of filters is as follows:
+  # study > brain region > comparison > analysis > gene
+  
+  # render gene selector
   output$select_network_genes = renderUI({
     selectizeInput("network_genes", "Select Genes",
                    choices = valid_genes()[, Symbol], multiple = T)
   })
   
-  # get all datasets
-  net_datasets = main$find() %>% as.data.table()
-  
-  # make dataset selector
+  # render study selector
   output$select_network_study = renderUI({
     selectizeInput("network_study", "Select Study",
-                   choices = net_datasets[, unique(StudyName)], multiple = F,
+                   choices = all_datasets[, unique(StudyName)], multiple = F,
                    selected = "ROSMAP")
   })
   
-  # make brain region selector
+  # render brain region selector
   output$select_network_region = renderUI({
     selectizeInput("network_region", "Select Brain Region",
-                   choices = net_datasets[StudyName %in% input$network_study, unique(BrainRegionFull)], multiple = T,
+                   choices = all_datasets[StudyName %in% input$network_study, unique(BrainRegionFull)], multiple = T,
                    selected = "Dorsolateral Prefrontal Cortex")
   })
   
-  # make comparison selector
+  # render comparison selector
   output$select_network_contrast = renderUI({
     selectizeInput("network_contrast", "Select Contrast",
-                   choices = net_datasets[StudyName %in% input$network_study & BrainRegionFull %in% input$network_region, unique(Contrast)], multiple = T,
+                   choices = all_datasets[StudyName %in% input$network_study & BrainRegionFull %in% input$network_region, unique(Contrast)], multiple = T,
                    selected = "B3-B1")
   })
   
-  # make dataset selector
+  # render analysis selector
   output$select_network_analysis = renderUI({
     
-    possible_analyses = net_datasets[StudyName %in% input$network_study & BrainRegionFull %in% input$network_region & Contrast %in% input$network_contrast, FileName]
+    possible_analyses = all_datasets[StudyName %in% input$network_study & BrainRegionFull %in% input$network_region & Contrast %in% input$network_contrast, FileName]
     names(possible_analyses) = gsub("(_)|(.csv)", " ", possible_analyses)
     
     selectizeInput("network_analysis", "Select Analysis",
@@ -234,12 +348,19 @@ server <- function(input, output, session) {
     
     # complete API call to retrieve network
     network_request = httr::POST(url = paste0(root_api, "/tsv/network"), body = get_network)
+    message("Making POST request to STRING database")
     network = httr::content(network_request, as = "text", encoding = "UTF-8") %>%
       fread() %>%
       .[, c("stringId_A", "stringId_B", "ncbiTaxonId") := NULL] %>%
       unique()
     
   })
+  
+  # # inform user if they have not yet selected a dataset
+  # output$network_warning = eventReactive(input$generate_network, {
+  #   validate(need(nrow(network_query() > 0), "Please select a dataset of interest and update the graph."))
+  #   ""
+  # })
   
   # make updated query, using eventReactive() to minimize database calls
   network_query = eventReactive(input$update_network, {
@@ -250,6 +371,7 @@ server <- function(input, output, session) {
     
     # query database for fold-change and significance values in user-selected analysis
     # construct MongoDB query below, example of input$network_analysis: "ROSMAP_PFC_Braak_B3-B1.csv"
+    message("Querying MongoDB database, expression collection")
     expression$find(paste0('{"FileName" : "', input$network_analysis, '"}'))
   })
   

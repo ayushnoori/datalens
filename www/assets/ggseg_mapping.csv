@@ -1,0 +1,25 @@
+﻿Region,Mapping,Atlas
+Amygdala,amygdala,aseg
+Anterior Cingulate,caudal anterior cingulate,dk
+Caudate Nucleus,caudate,aseg
+Cerebellum,cerebellum cortex,aseg
+Cortex,NA,dk
+Dorsolateral Prefrontal Cortex,caudal middle frontal,dk
+Frontal Pole,frontal pole,dk
+Hippocampus,hippocampus,aseg
+Inferior Frontal Gyrus,frontal pole,dk
+Inferior Temporal Gyrus,inferior temporal,dk
+Middle Temporal Gyrus,middle temporal,dk
+Nucleus Accumbens,CC central,aseg
+Occipital Visual Cortex,lateral occipital,dk
+Parahippocampal Gyrus,parahippocampal,dk
+Parietal Neocortex,inferior parietal,dk
+Posterior Cingulate Cortex,posterior cingulate,dk
+Precentral Gyrus,precentral,dk
+Prefrontal Cortex,frontal pole,dk
+Putamen,putamen,aseg
+Superior Parietal Lobule,superior parietal,dk
+Superior Temporal Gyrus,superior temporal,dk
+Temporal Cortex,transverse temporal,dk
+Temporal Pole,temporal pole,dk
+White Matter of Forebrain,frontal pole,dk

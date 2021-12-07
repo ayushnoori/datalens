@@ -27,8 +27,8 @@ ui <- dashboardPage(
       menuItem("Home", tabName = "home", icon = icon("home")),
       menuItem("Input Genes", tabName = "input", icon = icon("dna")),
       menuItem("Differential Expression", tabName = "expression", icon = icon("chart-bar")),
-      menuItem("Regional Expression", tabName = "regional-expression", icon = icon("chart-pie")),
-      menuItem("Interaction Network", tabName = "network", icon = icon("project-diagram"))
+      menuItem("Interaction Network", tabName = "network", icon = icon("project-diagram")),
+      menuItem("Regional Expression", tabName = "regional-expression", icon = icon("brain"))
     )
   ),
   
@@ -66,7 +66,7 @@ ui <- dashboardPage(
                       tags$li("In 2021, Alzheimer's disease and related dementias will cost the U.S. economy $355 billion; by 2050, this cost could rise to $1.1 trillion. In addition, more than 11 million Americans provided 15.3 billion hours of unpaid care for people with Alzheimer's and other dementias in 2020 ― this labor is valued at nearly $257 billion. Importantly, these statistics fail to account for the emotional toll on families and caregivers.")
                     ),
                     footer = tags$p(tags$strong("Source: "), tags$a(tags$span(style = "font-style: italic;", "Alzheimer's Disease Facts and Figures,"), "Alzheimer's Association 2021", href = "https://www.alz.org/alzheimers-dementia/facts-figures", target = "blank", rel = "noopener noreferrer", style = "color: black; text-decoration: none;"))
-                ),
+                )
               )
       ),
       
@@ -78,7 +78,7 @@ ui <- dashboardPage(
                   title = "Input Genes", status = "primary", solidHeader = TRUE, width = 5,
                   tags$p("Please input the list of human genes which you would like to analyze below. Validate the gene set using", tags$a("genome-wide human annotations", href = "https://www.bioconductor.org/packages/release/data/annotation/html/org.Hs.eg.db.html", target = "blank", rel = "noopener noreferrer"), "to confirm that all identifiers are found. The following identifiers are accepted: HGNC symbol, Ensembl ID, ENTREZ ID, and UniProt ID."),
                   textAreaInput("input_genes", label = "Gene List",
-                                value = "APOE\nAPP\nAQP1\nAQP4\nBACE1\nC3\nCD44\nCD68\nCHI3L1\nCRYAB\nGFAP\nGLUL\nIL18\nIL1B\nMAPT\nPSEN1\nRELA\nTMEM119\nTNFA\nTP53\nTSPO\nVIM",
+                                value = "APOE\nAPP\nAQP1\nAQP4\nBACE1\nC3\nCD44\nCD68\nCHI3L1\nCRYAB\nGFAP\nGLUL\nIL18\nIL1B\nMAPT\nPSEN1\nRELA\nTMEM119\nTNF\nTP53\nTSPO\nVIM",
                                 height = "300px"),
                   # define list separator
                   radioButtons("input_sep", label = "Separator", inline = T,
@@ -126,16 +126,6 @@ ui <- dashboardPage(
               )
       ),
       
-      # REGIONAL EXPRESSION
-      tabItem(tabName = "regional-expression",
-              fluidRow(
-                box(title = "Select Filters", status = "primary", solidHeader = TRUE, width = 4,
-                    tags$p("Modify the gene list in Input Genes."),
-                ),
-                box(title = "Regional Expression", status = "warning", solidHeader = TRUE, width = 8
-                )
-              )
-      ),
       
       # NETWORK
       tabItem(tabName = "network",
@@ -158,7 +148,28 @@ ui <- dashboardPage(
                   )
                 ),
                 box(title = "Network Plot", status = "warning", solidHeader = TRUE, width = 8,
+                    # textOutput("network_warning"),
                     girafeOutput("network_plot")
+                )
+              )
+      ),
+      
+      
+      # REGIONAL EXPRESSION
+      tabItem(tabName = "regional-expression",
+              fluidRow(
+                box(title = "Select Filters", status = "primary", solidHeader = TRUE, width = 4,
+                    tags$p("Using the validated gene set from", tags$span(style = "font-style: italic;", "Input Genes,"), " explore the expression levels of a gene of interest in specific brain regions."),
+                    uiOutput("select_region_gene"),
+                    uiOutput("select_region")
+                ),
+                box(title = "Brain Regions", status = "warning", solidHeader = TRUE, width = 8,
+                    tags$div(plotOutput("dk_plot"), style = "width: 49%; display: inline-block;"),
+                    tags$div(plotOutput("aseg_plot"), style = "width: 49%; display: inline-block;")
+                )),
+              fluidRow(
+                box(title = "Datasets", status = "warning", solidHeader = TRUE, width = 12,
+                    tags$div(style = 'overflow-x: auto', DT::DTOutput("region_table"))
                 )
               )
       )
