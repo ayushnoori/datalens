@@ -144,7 +144,7 @@ server <- function(input, output, session) {
                .[!duplicated(Dataset)] %>%
                ggplot(aes(x = Dataset, y = logFC, fill = P)) +
                geom_bar(stat = "identity", color = "black") +
-               scale_fill_gradient(low = "#FF851B", high = "#9EA3B0") +
+               scale_fill_gradient(low = "#FF6B6B", high = "#9EA3B0") +
                labs(fill = "P-Value") +
                base_theme + theme(axis.text.x = element_blank()))
   })

@@ -1,0 +1,186 @@
+/* 
+DataLENS 2.0
+Ayush Noori
+CS50 Final Project
+*/
+
+
+
+/* TEXT */
+
+/* headers and sidebar menu text */
+h1, h2, h3, h4, .skin-purple .sidebar-menu>li>a {
+    font-family: Century Gothic, "sans-serif";
+}
+
+/* links */
+a {
+    color: #2E6FFC;
+}
+a:hover {
+    color: #5E90FD;
+}
+
+
+
+/* INPUTS (BUTTONS, CHECKBOXES, ETC.) */
+
+/* button container */
+.btn-div {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center:
+}
+
+/* button, modified from https://cssbuttons.io/detail/alexmaracinaru/perfect-panda-77 and https://codeconvey.com/css-animate-gradient-on-hover/*/
+.btn, .btn-default, .action-button {
+    cursor: pointer;
+    font-family: Century Gothic, "sans-serif";
+    font-weight: 400;
+    transition: all .5s;
+    padding: 5px 10px;
+    display: flex;
+    align-items: center;
+    border: 0px;
+    border-radius: 100px;
+    background: #2E6FFC;
+    background: linear-gradient(90deg, var(--c1, #2E6FFC), var(--c2, #6006EA) 51%, var(--c1, #2E6FFC)) var(--x, 0)/ 200%;
+    font-size: 14px;
+    color: white;
+}
+
+/* override Shiny CSS */
+.btn-default:hover, .btn:hover, .action-button:hover {
+    background: #2E6FFC !important;
+    background:  linear-gradient(90deg, var(--c1, #2E6FFC), var(--c2, #6006EA) 51%, var(--c1, #2E6FFC)) var(--x, 0)/ 200% !important;
+    --x: 100%;
+    border: 0px !important;
+    color: white !important;
+}
+
+/* override Shiny CSS */
+.btn-default:focus, .btn:focus, .action-button:focus {
+    background: #2E6FFC !important;
+    background: linear-gradient(90deg, var(--c1, #2E6FFC), var(--c2, #6006EA) 51%, var(--c1, #2E6FFC)) var(--x, 0)/ 200% !important;
+    border: 0px !important;
+    color: white !important;
+}
+
+/* override Shiny CSS */
+.btn-default:active, .btn:active, .action-button:active {
+    background: #2E6FFC !important;
+    background: linear-gradient(90deg, var(--c1, #2E6FFC), var(--c2, #6006EA) 51%, var(--c1, #2E6FFC)) var(--x, 0)/ 200% !important;
+    --x: 100%;
+    border: 0px !important;
+    color: white !important;
+}
+
+/* button arrow SVG */
+.btn > svg {
+    width: 34px;
+    margin-left: 10px;
+    transition: transform .3s ease-in-out;
+}
+
+.btn:hover svg {
+    transform: translateX(7px);
+}
+
+/* label for inputs */
+.control-label {
+    font-family: Century Gothic, "sans-serif";
+    font-weight: 700;
+    font-size: 14px;
+}
+
+
+
+/* HEADER */
+
+/* logo title */
+#datalens-logo {
+    height: 60%;
+}
+
+/* logo background */
+.skin-purple .main-header .logo {
+    background-color: #2E6FFC;
+}
+
+/* logo background when hovered */
+.skin-purple .main-header .logo:hover {
+    /* background-color: #2267FC; */
+    background-color: #2E6FFC; /* do not make darker */
+}
+
+/* navigation bar (i.e., rest of the header) */
+.skin-purple .main-header .navbar {
+    background: rgb(46,111,252);
+    background: linear-gradient(90deg, rgba(46,111,252,1) 0%, rgba(96,6,234,1) 100%);
+}
+
+/* active bar in sidebar menu */
+.skin-purple .sidebar-menu>li.active>a, .skin-purple .sidebar-menu>li:hover>a {
+    border-left-color: #6006EA;
+}
+
+/* hover over sidebar toggle, get parent div */
+.skin-purple .main-header .navbar .sidebar-toggle:hover {
+    background-color: #2267FC;
+}
+
+
+
+/* BOXES */
+
+/* fix box header margin */
+.box-header {
+    margin: -1px;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+}
+
+/* primary box */
+.box.box-solid.box-primary {
+    border-radius: 5px;
+    border: 1px solid #2E6FFC;
+}
+.box.box-solid.box-primary > .box-header {
+    background: #2E6FFC;
+}
+
+/* success box */
+.box.box-solid.box-success {
+    border-radius: 5px;
+    border: 1px solid #70A9A1;
+}
+.box.box-solid.box-success > .box-header {
+    background: #70A9A1;
+    /* border: 1px solid #70A9A1; */
+}
+
+/* danger box */
+.box.box-solid.box-danger {
+    border-radius: 5px;
+    border: 1px solid #FF6B6B;
+}
+.box.box-solid.box-danger > .box-header {
+    background: #FF6B6B;
+}
+
+/* warning box */
+.box.box-solid.box-warning {
+    border-radius: 5px;
+    border: 1px solid #6006EA;
+}
+.box.box-solid.box-warning > .box-header {
+    background: #6006EA;
+}
+
+/* value box */
+.bg-aqua {
+    border-radius: 5px;
+    /* background-color: #B7918C !important; */
+    background: linear-gradient(120deg, #2E6FFC 0%, #6006EA 100%) !important;
+}
