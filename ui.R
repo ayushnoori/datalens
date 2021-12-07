@@ -1,4 +1,4 @@
-# DataLENS 2.0
+# Alzheimer DataLENS
 # Ayush Noori
 # CS50 Final Project
 
@@ -55,8 +55,9 @@ ui <- dashboardPage(
                     tags$p("Interested in exploring DataLENS? Please follow the steps below:"),
                     tags$ol(
                       tags$li("Input a list of genes to ", tags$span(style = "font-style: italic;", "Input Genes,"), "then validate the gene set to confirm that all identifiers are found."),
-                      tags$li("In ", tags$span(style = "font-style: italic;", "Differential Expression Analysis,"), " select a gene of interest. Explore how the expression levels of this gene changes in Alzheimer's disease and related dementias."),
-                      tags$li("In ", tags$span(style = "font-style: italic;", "Interaction Network,"), "select genes of interest. Explore interactions between these genes in the cellular interactome."),
+                      tags$li("In ", tags$span(style = "font-style: italic;", "Differential Expression Analysis,"), " select a gene of interest. Observe how the expression levels of this gene changes in Alzheimer's disease and related dementias."),
+                      tags$li("In ", tags$span(style = "font-style: italic;", "Interaction Network,"), "select genes of interest. Investigate interactions between these genes in the cellular interactome."),
+                      tags$li("In ", tags$span(style = "font-style: italic;", "Regional Expression,"), "explore transcriptomic datasets across brain regions.")
                     )),
                 box(title = "Alzheimer's Disease", status = "primary", solidHeader = TRUE, width = 7,
                     tags$p("Alzheimer's disease (AD) is a progressive neurodegenerative disorder which impairs memory and cognition, and for which there is currently no effective treatment nor cure."),
@@ -158,9 +159,10 @@ ui <- dashboardPage(
       # REGIONAL EXPRESSION
       tabItem(tabName = "regional-expression",
               fluidRow(
-                box(title = "Select Filters", status = "primary", solidHeader = TRUE, width = 4,
-                    tags$p("Using the validated gene set from", tags$span(style = "font-style: italic;", "Input Genes,"), " explore the expression levels of a gene of interest in specific brain regions."),
-                    uiOutput("select_region_gene"),
+                box(title = "Select Brain Region", status = "primary", solidHeader = TRUE, width = 4,
+                    # tags$p("Using the validated gene set from", tags$span(style = "font-style: italic;", "Input Genes,"), " explore the expression levels of a gene of interest in specific brain regions."),
+                    # uiOutput("select_region_gene"),
+                    tags$p("Explore transcriptomic datasets across various brain regions by selecting region(s) of interest below."),
                     uiOutput("select_region")
                 ),
                 box(title = "Brain Regions", status = "warning", solidHeader = TRUE, width = 8,

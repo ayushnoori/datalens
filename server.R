@@ -1,4 +1,4 @@
-# DataLENS 2.0
+# Alzheimer DataLENS
 # Ayush Noori
 # CS50 Final Project
 
@@ -177,120 +177,7 @@ server <- function(input, output, session) {
   })
   
   
-  # REGIONAL EXPRESSION ANALYSIS
-  # inspired by https://github.com/anniegbryant/DA5030_Final_Project
-  
-  # # construct brain region mapping
-  # brain_regions = unique(all_datasets$BrainRegionFull) %>%
-  #   data.table(Region = .) %>%
-  #   .[order(Region)]
-  
-  # read manual mapping file constructed from the brain regions in the Desikan-Killany (dk) cortical atlas
-  # and automatic subcortical segmentation atlas (aseg), remove bulk cortex
-  brain_mapping = fread("www/assets/ggseg_mapping.csv")[!Region == "Cortex"]
-  
-  # render selector for gene of interest
-  output$select_region_gene = renderUI(
-    selectInput("region_gene", "Select Gene of Interest", choices = valid_genes()[, Symbol]))
-  
-  # render selector for brain region
-  # output$select_region = renderUI(
-  #   checkboxGroupInput("regions", "Select Brain Region", choices = brain_mapping$Region, inline = F))
-  
-  # render dropdown selector
-  output$select_region = renderUI(
-    selectizeInput("regions", "Select Brain Region", choices = brain_mapping$Region, multiple = T))
-  
-  # define theme for brain plots
-  atlas_theme = theme(axis.text = element_blank(),
-                      axis.title = element_blank(),
-                      legend.position = "none")
-  
-  # plot DK atlas brain regions
-  output$dk_plot = renderPlot({
-    
-    # get selected regions which correspond to the Desikan-Killany (dk) cortical atlas
-    # example of input$regions: c("Amygdala", "Inferior Frontal Gyrus", "Frontal Pole", "Putamen", "Superior Temporal Gyrus")
-    dk_regions = brain_mapping[Region %in% input$regions & Atlas == "dk", ]
-    
-    # save computation time if no regions are selected
-    if(nrow(dk_regions) == 0) {
-      
-      dk_out = ggseg(atlas = "dk", fill = "#DAE0E7",
-                     color = "white", position = "stacked") +
-        atlas_theme
-      
-    # otherwise, search for and highlight selected regions
-    } else {
-      
-      dk_data = as.data.table(dk$data) %>%
-        .[, Selected := factor(ifelse(region %in% dk_regions$Mapping, "Yes", "No"), levels = c("Yes", "No"))] %>%
-        .[, .(region, Selected)] %>%
-        unique()
-      
-      dk_out = ggseg(dk_data, atlas = "dk", mapping = aes(fill = Selected),
-            color = "white", position = "stacked") +
-        scale_fill_manual(values = c("#FF6B6B", "#DAE0E7"), na.value = "#DAE0E7") + 
-        atlas_theme
-      
-    }
-    
-    dk_out
-    
-  })
-  
-  # plot ASEG atlas brain regions
-  output$aseg_plot = renderPlot({
-    
-    # get selected regions which correspond to the automatic subcortical segmentation atlas (aseg) cortical atlas
-    aseg_regions = brain_mapping[Region %in% input$regions & Atlas == "aseg", ]
-    
-    # save computation time if no regions are selected
-    if(nrow(aseg_regions) == 0) {
-      
-      aseg_out = ggseg(atlas = "aseg", fill = "#DAE0E7",
-                     color = "white") +
-        atlas_theme
-      
-      # otherwise, search for and highlight selected regions
-    } else {
-      
-      aseg_data = as.data.table(aseg$data) %>%
-        .[, Selected := factor(ifelse(region %in% aseg_regions$Mapping, "Yes", "No"), levels = c("Yes", "No"))] %>%
-        .[, .(region, Selected)] %>%
-        unique()
-      
-      aseg_out = ggseg(aseg_data, atlas = "aseg", mapping = aes(fill = Selected), color = "white") +
-        scale_fill_manual(values = c("#FF6B6B", "#DAE0E7"), na.value = "#DAE0E7") + 
-        atlas_theme
-      
-    }
-    
-    aseg_out
-    
-  })
-  
-  # rename columns
-  dataset_cols = c("BrainRegionFull", "StudyName", "DatasetCode", "StratFactor", "LabelGroupA", "LabelGroupB", "NGenes", "StudySynID")
-  dataset_col_names = c("Region", "Study", "Code", "Factor", "Group 1", "Group 2", "No. Genes", "Reference")
-  
-  # create table for second tab
-  output$region_table = renderDT({
-    all_datasets %>%
-      .[BrainRegionFull %in% input$regions] %>%
-      .[, LabelGroupA := paste0(LabelGroupA, " (n=", NSubjectsGroupA, ")")] %>%
-      .[, LabelGroupB := paste0(LabelGroupB, " (n=", NSubjectsGroupB, ")")] %>%
-      .[, .SD, .SDcols = dataset_cols] %>%
-      setnames(dataset_cols, dataset_col_names)
-  })
-  
-  
-  # query subjects by filters, etc.
-  # query subject expression by subjects returned
-  # forest plot
-  
-  
-  # NETWORK
+  # INTERACTION NETWORK ANALYSIS
   
   # hierarchy of filters is as follows:
   # study > brain region > comparison > analysis > gene
@@ -432,6 +319,120 @@ server <- function(input, output, session) {
       ))
     
   })
+  
+  
+  
+  # REGIONAL EXPRESSION ANALYSIS
+  # inspired by https://github.com/anniegbryant/DA5030_Final_Project
+  
+  # # construct brain region mapping
+  # brain_regions = unique(all_datasets$BrainRegionFull) %>%
+  #   data.table(Region = .) %>%
+  #   .[order(Region)]
+  
+  # read manual mapping file constructed from the brain regions in the Desikan-Killany (dk) cortical atlas
+  # and automatic subcortical segmentation atlas (aseg), remove bulk cortex
+  brain_mapping = fread("www/assets/ggseg_mapping.csv")[!Region == "Cortex"]
+  
+  # # render selector for gene of interest
+  # output$select_region_gene = renderUI(
+  #   selectInput("region_gene", "Select Gene of Interest", choices = valid_genes()[, Symbol]))
+  
+  # render selector for brain region
+  # output$select_region = renderUI(
+  #   checkboxGroupInput("regions", "Select Brain Region", choices = brain_mapping$Region, inline = F))
+  
+  # render dropdown selector
+  output$select_region = renderUI(
+    selectizeInput("regions", "Select Brain Region", choices = brain_mapping$Region, multiple = T))
+  
+  # define theme for brain plots
+  atlas_theme = theme(axis.text = element_blank(),
+                      axis.title = element_blank(),
+                      legend.position = "none")
+  
+  # plot dk atlas brain regions
+  output$dk_plot = renderPlot({
+    
+    # get selected regions which correspond to the Desikan-Killany (dk) cortical atlas
+    # example of input$regions: c("Amygdala", "Inferior Frontal Gyrus", "Frontal Pole", "Putamen", "Superior Temporal Gyrus")
+    dk_regions = brain_mapping[Region %in% input$regions & Atlas == "dk", ]
+    
+    # save computation time if no regions are selected
+    if(nrow(dk_regions) == 0) {
+      
+      dk_out = ggseg(atlas = "dk", fill = "#DAE0E7",
+                     color = "white", position = "stacked") +
+        atlas_theme
+      
+      # otherwise, search for and highlight selected regions
+    } else {
+      
+      # check if atlas regions are in the vector of selected regions
+      dk_data = as.data.table(dk$data) %>%
+        .[, Selected := factor(ifelse(region %in% dk_regions$Mapping, "Yes", "No"), levels = c("Yes", "No"))] %>%
+        .[, .(region, Selected)] %>%
+        unique()
+      
+      # create brain segmentation plot
+      dk_out = ggseg(dk_data, atlas = "dk", mapping = aes(fill = Selected),
+                     color = "white", position = "stacked") +
+        scale_fill_manual(values = c("#FF6B6B", "#DAE0E7"), na.value = "#DAE0E7") + 
+        atlas_theme
+      
+    }
+    
+    dk_out
+    
+  })
+  
+  # plot aseg atlas brain regions
+  output$aseg_plot = renderPlot({
+    
+    # get selected regions which correspond to the automatic subcortical segmentation atlas (aseg) cortical atlas
+    aseg_regions = brain_mapping[Region %in% input$regions & Atlas == "aseg", ]
+    
+    # save computation time if no regions are selected
+    if(nrow(aseg_regions) == 0) {
+      
+      aseg_out = ggseg(atlas = "aseg", fill = "#DAE0E7",
+                       color = "white") +
+        atlas_theme
+      
+      # otherwise, search for and highlight selected regions
+    } else {
+      
+      # check if aseg atlas regions are in the vector of selected regions
+      aseg_data = as.data.table(aseg$data) %>%
+        .[, Selected := factor(ifelse(region %in% aseg_regions$Mapping, "Yes", "No"), levels = c("Yes", "No"))] %>%
+        .[, .(region, Selected)] %>%
+        unique()
+      
+      # create brain segmentation plot
+      aseg_out = ggseg(aseg_data, atlas = "aseg", mapping = aes(fill = Selected), color = "white") +
+        scale_fill_manual(values = c("#FF6B6B", "#DAE0E7"), na.value = "#DAE0E7") + 
+        atlas_theme
+      
+    }
+    
+    aseg_out
+    
+  })
+  
+  # rename columns
+  dataset_cols = c("BrainRegionFull", "StudyName", "DatasetCode", "StratFactor", "LabelGroupA", "LabelGroupB", "NGenes", "StudySynID")
+  dataset_col_names = c("Region", "Study", "Code", "Factor", "Group 1", "Group 2", "No. Genes", "Reference")
+  
+  # create table for second tab
+  output$region_table = renderDT({
+    all_datasets %>%
+      .[BrainRegionFull %in% input$regions] %>%
+      .[, LabelGroupA := paste0(LabelGroupA, " (n=", NSubjectsGroupA, ")")] %>%
+      .[, LabelGroupB := paste0(LabelGroupB, " (n=", NSubjectsGroupB, ")")] %>%
+      .[, .SD, .SDcols = dataset_cols] %>%
+      setnames(dataset_cols, dataset_col_names)
+  })
+  
   
 }
 
