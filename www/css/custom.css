@@ -25,6 +25,12 @@ a:hover {
 
 /* INPUTS (BUTTONS, CHECKBOXES, ETC.) */
 
+/* text area (i.e., text input) */
+textarea {
+    resize: vertical; /* only vertical */
+    overflow: auto;
+}
+
 /* button container */
 .btn-div {
     width: 100%;
@@ -34,11 +40,11 @@ a:hover {
 }
 
 /* button, modified from https://cssbuttons.io/detail/alexmaracinaru/perfect-panda-77 and https://codeconvey.com/css-animate-gradient-on-hover/*/
-.btn, .btn-default, .action-button {
+.btn:not(.btn-box-tool), .btn-default, .action-button {
     cursor: pointer;
     font-family: Century Gothic, "sans-serif";
     font-weight: 400;
-    transition: all .5s;
+    transition: all .5s ease-in-out;
     padding: 5px 10px;
     display: flex;
     align-items: center;
@@ -48,10 +54,11 @@ a:hover {
     background: linear-gradient(90deg, var(--c1, #2E6FFC), var(--c2, #6006EA) 51%, var(--c1, #2E6FFC)) var(--x, 0)/ 200%;
     font-size: 14px;
     color: white;
+    margin-bottom: 0.7em;
 }
 
 /* override Shiny CSS */
-.btn-default:hover, .btn:hover, .action-button:hover {
+.btn:hover:not(.btn-box-tool), .btn-default:hover, .action-button:hover {
     background: #2E6FFC !important;
     background:  linear-gradient(90deg, var(--c1, #2E6FFC), var(--c2, #6006EA) 51%, var(--c1, #2E6FFC)) var(--x, 0)/ 200% !important;
     --x: 100%;
@@ -60,7 +67,7 @@ a:hover {
 }
 
 /* override Shiny CSS */
-.btn-default:focus, .btn:focus, .action-button:focus {
+.btn:focus:not(.btn-box-tool), .btn-default:focus, .action-button:focus {
     background: #2E6FFC !important;
     background: linear-gradient(90deg, var(--c1, #2E6FFC), var(--c2, #6006EA) 51%, var(--c1, #2E6FFC)) var(--x, 0)/ 200% !important;
     border: 0px !important;
@@ -68,7 +75,7 @@ a:hover {
 }
 
 /* override Shiny CSS */
-.btn-default:active, .btn:active, .action-button:active {
+.btn:active:not(.btn-box-tool), .btn-default:active, .action-button:active {
     background: #2E6FFC !important;
     background: linear-gradient(90deg, var(--c1, #2E6FFC), var(--c2, #6006EA) 51%, var(--c1, #2E6FFC)) var(--x, 0)/ 200% !important;
     --x: 100%;
@@ -93,7 +100,6 @@ a:hover {
     font-weight: 700;
     font-size: 14px;
 }
-
 
 
 /* HEADER */
@@ -139,6 +145,10 @@ a:hover {
     margin: -1px;
     border-top-right-radius: 5px;
     border-top-left-radius: 5px;
+}
+
+.collapsed-box > .box-header {
+    border-radius: 5px;
 }
 
 /* primary box */

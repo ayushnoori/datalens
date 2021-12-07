@@ -42,13 +42,24 @@ ui <- dashboardPage(
       tabItem(tabName = "home",
               fluidRow(
                 # wide about box
-                box(title = "About", status = "primary", solidHeader = TRUE, width = 8,
-                    p("Alzheimer DataLENS is an open data analysis platform which aims to advance Alzheimer’s disease research by enabling the analysis, visualization, and sharing of -omics data. DataLENS houses bioinformatics pipelines for the analysis of -omics data on Alzheimer’s disease and related dementias as well as streamlined web interfaces which allow neuroscientists to browse and query the results of these analyses."),
+                box(title = "About DataLENS", status = "primary", solidHeader = TRUE, width = 8,
+                    tags$p("Alzheimer DataLENS is an open data analysis platform which aims to advance Alzheimer’s disease research by enabling the analysis, visualization, and sharing of -omics data. DataLENS houses bioinformatics pipelines for the analysis of -omics data on Alzheimer’s disease and related dementias as well as streamlined web interfaces which allow neuroscientists to browse and query the results of these analyses."),
                 ),
                 # narrow attribution box
-                box(title = "Attribution", status = "primary", solidHeader = TRUE, width = 4,
-                    p("Alzheimer DataLENS was created by ", a("Ayush Noori", href = "mailto:anoori1@mgh.harvard.edu"), "for CS50 at Harvard College. DataLENS is an initiative of the ", a("MIND Data Science Lab", href = "https://www.massgeneral.org/neurology/research/mind-data-science-lab"), "in the MassGeneral Institute for Neurodegenerative Disease (MIND) at Massachusetts General Hospital.")
+                box(title = "Attribution", status = "warning", solidHeader = TRUE, width = 4, collapsible = T, collapsed = F,
+                    tags$p("Alzheimer DataLENS was created by ", tags$a("Ayush Noori", href = "mailto:anoori1@mgh.harvard.edu"), "for CS50 at Harvard College. DataLENS is an initiative of the ", tags$a("MIND Data Science Lab", href = "https://www.massgeneral.org/neurology/research/mind-data-science-lab"), "in the MassGeneral Institute for Neurodegenerative Disease (MIND) at Massachusetts General Hospital.")
                 )
+              ),
+              fluidRow(
+                box(title = "Alzheimer's Disease", status = "primary", solidHeader = TRUE, width = 12,
+                    tags$p("Alzheimer's disease (AD) is a progressive neurodegenerative disorder which impairs memory and cognition, and for which there is currently no effective treatment nor cure."),
+                    tags$ul(
+                      tags$li("More than 6 million Americans live with AD today; in the absence of research advances, this number is projected to rise to 13 million by 2050."),
+                      tags$li("1 in 3 seniors will die with Alzheimer's disease or another dementia, more than breast cancer and prostate cancer combined. Further, during the COVID-19 pandemic, isolation and neglect of the vulnerable elderly caused deaths from Alzheimer's and other dementias to rise by 16%."),
+                      tags$li("In 2021, Alzheimer's disease and related dementias will cost the U.S. economy $355 billion; by 2050, this cost could rise to $1.1 trillion. In addition, more than 11 million Americans provided 15.3 billion hours of unpaid care for people with Alzheimer's and other dementias in 2020 ― this labor is valued at nearly $257 billion. Importantly, these statistics fail to account for the emotional toll on families and caregivers.")
+                    ),
+                    footer = tags$p(tags$strong("Source: "), tags$a(tags$span(style = "font-style: italic;", "Alzheimer's Disease Facts and Figures,"), "Alzheimer's Association 2021", href = "https://www.alz.org/alzheimers-dementia/facts-figures", style = "color: black; text-decoration: none;"))
+                ),
               )
       ),
       
@@ -73,7 +84,7 @@ ui <- dashboardPage(
                 column(width = 8,
                        # show validated genes as table
                        box(title = "Validated Genes", status = "success", solidHeader = TRUE, width = NULL,
-                           div(style = 'overflow-x: scroll', DT::DTOutput("valid_genes"))),
+                           div(style = 'overflow-x: auto', DT::DTOutput("valid_genes"))),
                        # show invalid genes as a comma-separated list
                        box(title = "Invalid Genes", status = "danger", solidHeader = TRUE, width = NULL,
                            textOutput("invalid_genes"))
@@ -102,7 +113,7 @@ ui <- dashboardPage(
               fluidRow(
                 # show results of differential expression analyses as table
                 box(title = "Differential Expression Analyses", width = 12, status = "warning", solidHeader = TRUE,
-                    div(style = 'overflow-x: scroll', DT::DTOutput("expr_table")))
+                    div(style = 'overflow-x: auto', DT::DTOutput("expr_table")))
               )
       ),
       

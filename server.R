@@ -62,10 +62,11 @@ server <- function(input, output, session) {
     genes_split
   })
   
-  # map genes
+  # validate input genes by mapping to human database
   select_keys = c("SYMBOL", "ENTREZID", "GENENAME", "ENSEMBL", "GENETYPE") # , "GO", "UNIPROT"
   select_key_names = c("Symbol", "ENTREZ", "Gene", "Ensembl", "Type") # "GO", "UniProt"
   select_result = eventReactive(input$validate_genes, {
+    # try/catch in case no mappings are found
     try_select = tryCatch(expr = {
       AnnotationDbi::select(org.Hs.eg.db, keys = raw_genes(), 
                             columns = select_keys, keytype = input$input_format,
@@ -76,6 +77,7 @@ server <- function(input, output, session) {
       error = function(e) {
         data.table()  
       })
+    # validate try/catch
     validate(need(nrow(try_select) > 0, "No matches found."))
     try_select
   })
@@ -83,10 +85,15 @@ server <- function(input, output, session) {
   # render output for valid genes table
   valid_genes = reactive(select_result()[!is.na(Gene), ])
   output$valid_genes =  DT::renderDT(valid_genes())
-  output$invalid_genes = renderText(
-    select_result()[is.na(Gene), .SD,
-                    .SDcols = select_key_names[which(select_keys == input$input_format)]][[1]],
-    sep = ", ")
+  
+  # render output for invalid genes list
+  output$invalid_genes = renderText({
+    # select invalid genes, if any
+    invalid_text = select_result()[is.na(Gene), .SD, .SDcols = select_key_names[which(select_keys == input$input_format)]][[1]]
+    # check if any invalid genes
+    if(length(invalid_text) == 0) invalid_text = "No invalid genes."
+    invalid_text
+  }, sep = ", ")
   
   # render output for expression analysis page
   output$select_gene = renderUI(
@@ -110,7 +117,7 @@ server <- function(input, output, session) {
   # query expression collection using gene input
   # run expression$index() to view indexes
   expr_dat = reactive({
-    expr_mat = expression$find(paste0('{"GeneSymbol" : "', input$expr_gene, '"}'))
+    expr_mat = expression$find(paste0('{"GeneSymbol" : "', input$expr_gene, '"}')) # database query
     validate(need(nrow(expr_mat) > 0, "No results available for this gene."))
     expr_mat %>%
       as.data.table() %>%
