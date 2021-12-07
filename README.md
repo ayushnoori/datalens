@@ -1,14 +1,14 @@
 
 <img src="www/assets/logo.svg" title="Alzheimer DataLENS" style="margin-top: 1em; margin-bottom: 1em;" width="504"/>
 
+# About DataLENS
+
 <!-- badges: start -->
 
-[![Lifecycle:
-experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)
 
 <!-- badges: end -->
-
-# About DataLENS
 
 Alzheimer DataLENS is an open data analysis platform which aims to
 advance Alzheimer’s disease (AD; see *About Alzheimer’s Disease* below)
@@ -16,10 +16,14 @@ research by enabling the analysis, visualization, and sharing of -omics
 data. DataLENS houses bioinformatics pipelines for the analysis of
 -omics data on Alzheimer’s disease and related dementias (ADRD) as well
 as streamlined web interfaces which allow neuroscientists to browse and
-query the results of these analyses. There are currently over 50
-genetic, proteomics, and transcriptomics studies included in the
-DataLENS database, most of which are already available to analyze and
-explore:
+query the results of these analyses. Note that -omics refers to the
+branch of science concerned with quantifying the levels of biological
+molecules (e.g., RNAs, proteins, etc.), and encompasses genomics,
+transcriptomics, proteomics, metabolomics, metagenomics, etc.
+
+There are currently over 50 genetic, proteomics, and transcriptomics
+studies included in the DataLENS database, most of which are already
+available to analyze and explore:
 
 **Gene Expression Data**
 
@@ -167,6 +171,20 @@ One can also connect to the MongoDB database via MongoDB Compass.
 Connect to a local database by passing an empty value as the connection
 string.
 
+### Accessing DataLENS Data
+
+Please note that the entire DataLENS database cannot be uploaded via
+Gradescope due to large file size (&gt; 20 GB, unindexed) as well as
+restrictions imposed by the Data Use Agreements (DUAs) of the source
+institutions. However, I have made a subset of the data available via
+DropBox (5.18 GBs)
+[here](https://www.dropbox.com/sh/ndbry59ksb0ci3b/AADNMQXL0ryfU_g_guERbCaja?dl=0).
+
+Please feel free to download these files locally for the purposes of
+testing DataLENS (see Step 3 under *Data Import*). However, please *do
+not* share or redistribute these files. The DropBox link will expire by
+02/06/2022; please reach out to request a new link after this date.
+
 ### Data Import
 
 To import the DataLENS database, please complete the following steps:
@@ -186,15 +204,8 @@ To import the DataLENS database, please complete the following steps:
     use datalens
     ```
 
-3.  Download the DataLENS database dump (in `.json` format) to a local
-    directory (e.g., `C:/Users/username/Downloads/datalens/`). Note that
-    this database *cannot* be made available (1) due to restrictions
-    imposed by the Data Use Agreements (DUAs) of the source
-    institutions; and (2) due to large file size (&gt; 20 GB,
-    unindexed). Rather, full-functionality of the DataLENS database is
-    demonstrated via my video (approved by Albert Zhu, CS50 TF).
-    Additional demonstrations are also available upon request (please
-    email [anoori@college.harvard.edu](anoori@college.harvard.edu)).
+3.  Download the DataLENS database dump (in `.bson` format) to a local
+    directory (e.g., `C:/Users/username/Downloads/datalens/`).
 
 4.  To restore the DataLENS database, run the following at the Command
     Prompt (i.e., *not* in the MongoDB Shell) at the directory where the
@@ -217,17 +228,19 @@ DataLENS!
 
 1.  First, download the CS50 final project submission files, or clone
     the DataLENS GitHub repository (access available upon request).
-2.  Open the `datalens` R project in RStudio, then open either `ui.R`,
-    which defines the user interface, or `server.R`, which defines the
+2.  Open the `datalens` R project in RStudio, then open `ui.R`, which
+    defines the user interface, and `server.R`, which defines the
     back-end server logic.
-3.  Click `Run App` in the upper right side of the RStudio editor.
+3.  Load all the libraries specified in `server.R` (i.e., run lines
+    8-30).
+4.  Click `Run App` in the upper right side of the RStudio editor.
     Alternatively, run `shiny::runApp()` in the R console. This will
     launch an instance of Alzheimer DataLENS as a locally hosted Shiny
     application.
-4.  To open DataLENS in a web browser, click `Open in Browser` or
+5.  To open DataLENS in a web browser, click `Open in Browser` or
     navigate to the local URL of the port where Shiny is listening on
     (e.g., <http://127.0.0.1:3704>).
-5.  Interrupt R to stop the application by pressing `Ctrl + C`, `Esc`,
+6.  Interrupt R to stop the application by pressing `Ctrl + C`, `Esc`,
     or the red `STOP` icon.
 
 ## Deploying to Production
@@ -242,20 +255,63 @@ local installation of MongoDB.
 
 # Using DataLENS
 
-To use DataLENS, please complete the following steps:
+To use Alzheimer DataLENS, please complete the following steps:
 
-1.  Input a list of genes to *Input Genes*, then validate the gene set
-    to confirm that all identifiers are found.
+1.  Summary information about DataLENS and AD is provided on the *Home*
+    tab.
 
-2.  In *Differential Expression Analysis*, select a gene of interest.
-    Observe how the expression levels of this gene changes in
-    Alzheimer’s disease and related dementias.
+2.  First, navigate to *Input Genes* and provide a list of genes to
+    DataLENS. Then, validate the gene set using genome-wide human
+    annotations to confirm that all identifiers are found. The following
+    identifiers are accepted: HGNC symbol, Ensembl ID, ENTREZ ID, and
+    UniProt ID. Descriptions and synonymous identifiers for validated
+    genes will be displayed, along with a list of any invalid genes
+    provided.
 
-3.  In *Interaction Network*, select genes of interest. Investigate
-    interactions between these genes in the cellular interactome.
+3.  Next, navigate to *Differential Expression Analysis*. Select a gene
+    of interest (from the list of genes validated in *Input Genes*), and
+    examine the records of differential expression analyses pertaining
+    to that gene. Note that `logFC` represents the log2 of the
+    fold-change (i.e., effect size, often between case and control, also
+    known as the M-value), `P` represents the nominal p-value (i.e.,
+    statistical significance), and `adj P` represents the p-value
+    adjusted for multiple comparisons. The variable `t` represents the
+    moderated t-statistic, or the ratio of the M-value to the standard
+    error, while `Ave. Expr.` represents the average expression value
+    for that gene. For additional information, please see the [*limma*
+    package
+    documentation](https://bioconductor.org/packages/release/bioc/html/limma.html).
 
-4.  In *Regional Expression*, explore transcriptomic datasets across
-    brain regions.
+    Next, select various datasets in the dropdown menu. Observe how the
+    expression levels of this gene change across various datasets. The
+    bar chart will dynamically update to display both effect size
+    (logFC) and significance (p-value, as color) across datasets of
+    interest. Hover over each record to display full details in a
+    tooltip.
+
+4.  In *Interaction Network*, select genes of interest. Investigate
+    interactions between these genes in the cellular interactome,
+    retrieved from the STRING database of known and predicted
+    protein-protein interactions (PPIs). Nodes in the network are
+    colored and scaled according to their differential expression
+    \[i.e., color is logFC while size is -log10(p-value)\] in a dataset
+    of choice. The weight of each edge represents the combined score
+    (across gene neighborhood, gene fusion, phylogenetic profile,
+    coexpression, experimental evidence, database records, and text
+    mining) for interaction between two nodes. Note that the user must
+    select `Update Network` before the graph will render.
+
+5.  In *Regional Expression*, explore transcriptomic datasets across
+    brain regions. Select brain region(s) of choice in the dropdown
+    menu, and examine records for transcriptomic datasets corresponding
+    to that brain region. Brain regions are also visualized in brain
+    segmentation plots constructed using the Desikan-Killany cortical
+    atlas and automatic subcortical segmentation atlas.
+
+# Video
+
+The brief video describing Alzheimer’s DataLENS is available via YouTube
+at: .
 
 # About Alzheimer’s Disease
 

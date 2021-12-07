@@ -30,7 +30,7 @@ library(ggraph) # graph plotting
 library(ggiraph) # interactive graph plotting
 
 # log the reactive graph
-library(reactlog)
+# library(reactlog)
 
 # plotting theme
 base_theme = theme_bw() + theme(
@@ -45,8 +45,10 @@ base_theme = theme_bw() + theme(
 mongo_url = "mongodb://127.0.0.1:27017"
 main = mongo(collection = "main", db = "datalens", url = mongo_url)
 expression = mongo(collection = "expression", db = "datalens", url = mongo_url)
-subject_expression = mongo(collection = "subject_expression", db = "datalens", url = mongo_url)
-subject_covariates = mongo(collection = "subject_covariates", db = "datalens", url = mongo_url)
+
+# the following two collections are excluded to comply with Data Use Agreements
+# subject_expression = mongo(collection = "subject_expression", db = "datalens", url = mongo_url)
+# subject_covariates = mongo(collection = "subject_covariates", db = "datalens", url = mongo_url)
 
 
 # SERVER LOGIC
@@ -389,7 +391,7 @@ server <- function(input, output, session) {
   # plot aseg atlas brain regions
   output$aseg_plot = renderPlot({
     
-    # get selected regions which correspond to the automatic subcortical segmentation atlas (aseg) cortical atlas
+    # get selected regions which correspond to the automatic subcortical segmentation atlas (aseg)
     aseg_regions = brain_mapping[Region %in% input$regions & Atlas == "aseg", ]
     
     # save computation time if no regions are selected
