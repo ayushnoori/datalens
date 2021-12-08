@@ -24,7 +24,7 @@ Alzheimer DataLENS is an [R Shiny](https://shiny.rstudio.com/) web application w
 
 # User Interface
 
-The file `ui.R` defines the user interface (UI) of the application, using a `shinydashboard` foundation supplemented by custom CSS defined in `www/assets/css`. I also employ various R objects from the `htmltools` package which represent HTML tags (see `?htmltools::builder`) and use the `tags$zzz` syntax to prevent namespace conflicts. I aimed to design the UI, color scheme, and DataLENS logo as modern yet minimalist, and include various icons from [FontAwesome](https://fontawesome.com/) to guide the user through the web application.
+The file `ui.R` defines the user interface (UI) of the application, using a `shinydashboard` foundation supplemented by custom CSS defined in `www/css/custom.css`. I also employ various R objects from the `htmltools` package which represent HTML tags (see `?htmltools::builder`) and use the `tags$zzz` syntax to prevent namespace conflicts. I aimed to design the UI, color scheme, and DataLENS logo as modern yet minimalist, and include various icons from [FontAwesome](https://fontawesome.com/) to guide the user through the web application.
 
 # Shiny Reactivity
 

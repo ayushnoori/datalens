@@ -20,7 +20,7 @@ quantifying the levels of biological molecules.
 
 The file `ui.R` defines the user interface (UI) of the application,
 using a `shinydashboard` foundation supplemented by custom CSS defined
-in `www/assets/css`. I also employ various R objects from the
+in `www/css/custom.css`. I also employ various R objects from the
 `htmltools` package which represent HTML tags (see
 `?htmltools::builder`) and use the `tags$zzz` syntax to prevent
 namespace conflicts. I aimed to design the UI, color scheme, and

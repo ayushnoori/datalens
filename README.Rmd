@@ -194,9 +194,11 @@ To use Alzheimer DataLENS, please complete the following steps:
 
 5.  In *Regional Expression*, explore transcriptomic datasets across brain regions. Select brain region(s) of choice in the dropdown menu, and examine records for transcriptomic datasets corresponding to that brain region. Brain regions are also visualized in brain segmentation plots constructed using the Desikan-Killany cortical atlas and automatic subcortical segmentation atlas.
 
-# Video
+# Video Presentation
 
-The brief video describing Alzheimer's DataLENS is available via YouTube at: .
+I showcase Alzheimer's DataLENS in a brief video available on YouTube at: <https://youtu.be/kuJpuaAQ-Lk>.
+
+[![](www/assets/video_cover.png "CS50 Final Project: Alzheimer DataLENS")](https://youtu.be/kuJpuaAQ-Lk)
 
 # About Alzheimer's Disease
 
