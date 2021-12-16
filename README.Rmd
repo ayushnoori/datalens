@@ -131,9 +131,7 @@ One can also connect to the MongoDB database via MongoDB Compass. Connect to a l
 
 ### Accessing DataLENS Data
 
-Please note that the entire DataLENS database cannot be uploaded via Gradescope due to large file size (\> 20 GB, unindexed) as well as restrictions imposed by the Data Use Agreements (DUAs) of the source institutions. However, I have made a subset of the data available via DropBox (5.18 GBs) [here](https://www.dropbox.com/sh/ndbry59ksb0ci3b/AADNMQXL0ryfU_g_guERbCaja?dl=0).
-
-Please feel free to download these files locally for the purposes of testing DataLENS (see Step 3 under *Data Import*). However, please *do not* share or redistribute these files. The DropBox link will expire by 02/06/2022; please reach out to request a new link after this date.
+Please note that, due to restrictions imposed by the Data Use Agreements (DUAs) of the source institutions, the DataLENS database cannot be made publicly available. Access to a subset of the data may be provided [upon request](mailto:anoori1@mgh.harvard.edu) (e.g., to CS50 course staff).
 
 ### Data Import
 
